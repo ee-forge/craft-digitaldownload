@@ -39,7 +39,7 @@ class DigitalDownloadVariable
         return DigitalDownload::$plugin->digitalDownload->createToken($file, $options);
     }
 
-    // =========================================================================
+    // ========================================================================= //
 
     /**
      * Generates a URL to download the file.
@@ -83,7 +83,7 @@ class DigitalDownloadVariable
         return Template::raw("<a href=\"{$url}\">{$label}</a>");
     }
 
-    // =========================================================================
+    // ========================================================================= //
 
     /**
      * Get the link data from an existing token.

@@ -37,6 +37,7 @@ module.exports = {
                     {text: 'Storing a Token', link: '/storing-a-token/'},
                     {text: 'Short Download Links', link: '/short-download-links/'},
                     {text: 'Get Link Data from a Token', link: '/get-link-data-from-a-token/'},
+                    {text: 'Hotlinking', link: '/hotlinking/'},
                 ]
             },
             {
@@ -55,6 +56,7 @@ module.exports = {
                 'storing-a-token',
                 'short-download-links',
                 'get-link-data-from-a-token',
+                'hotlinking',
             ],
         }
     }

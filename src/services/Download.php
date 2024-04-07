@@ -13,17 +13,18 @@ namespace doublesecretagency\digitaldownload\services;
 
 use Craft;
 use craft\base\Component;
-use craft\base\FsInterface;
 use craft\elements\Asset;
 use craft\elements\User;
+use craft\errors\SiteNotFoundException;
 use craft\fs\Local;
 use craft\helpers\App;
 use craft\helpers\Json;
-use craft\models\Volume;
+use craft\helpers\UrlHelper;
 use DateTime;
 use DateTimeZone;
 use doublesecretagency\digitaldownload\DigitalDownload;
 use doublesecretagency\digitaldownload\models\Link;
+use doublesecretagency\digitaldownload\models\Settings;
 use doublesecretagency\digitaldownload\records\Log as LogRecord;
 use doublesecretagency\digitaldownload\records\Token as TokenRecord;
 use Exception;
@@ -143,7 +144,7 @@ class Download extends Component
         $log->save();
     }
 
-    // =========================================================================
+    // ========================================================================= //
 
     /**
      * Prepare to download file.
@@ -269,7 +270,7 @@ class Download extends Component
         exit;
     }
 
-    // =========================================================================
+    // ========================================================================= //
 
     /**
      * Check whether file download is authorized.
@@ -280,6 +281,12 @@ class Download extends Component
      */
     public function authorized(Link $link): bool
     {
+        // If domain is not permitted (ie: hotlinked), set error and bail
+        if (!$this->_isPermittedDomain($link)) {
+            $link->error = 'Hotlinking is not permitted.';
+            return false;
+        }
+
         // If link is not enabled, set error and bail
         if (!$this->_isEnabled($link)) {
             $link->error = 'Download link is disabled.';
@@ -315,6 +322,71 @@ class Download extends Component
 
         // Passed all checks
         return true;
+    }
+
+    /**
+     * Check whether link is being hotlinked from a different domain.
+     *
+     * @param Link $link Data regarding file download link.
+     * @return bool
+     * @throws SiteNotFoundException
+     */
+    private function _isPermittedDomain(Link $link): bool
+    {
+        // Get domains of referrer and this site
+        $referrer    = $this->_getDomain(Craft::$app->getRequest()->getReferrer());
+        $currentSite = $this->_getDomain(UrlHelper::baseSiteUrl());
+
+        // If referred by this site, return true
+        if ($referrer === $currentSite) {
+            return true;
+        }
+
+        /** @var Settings $settings */
+        $settings = DigitalDownload::$plugin->getSettings();
+
+        // If set to 'all' in "Settings" OR link configuration
+        if ('all' === $settings->allowHotlinks || 'all' === $link->allowHotlinks) {
+            // All hotlinks allowed, return true
+            return true;
+        }
+
+        // If set to 'none' in "Settings" AND link configuration
+        if ('none' === $settings->allowHotlinks && 'none' === $link->allowHotlinks) {
+            // No hotlinks allowed, return false
+            return false;
+        }
+
+        // Initialize hotlink domains
+        $hotlinksWhitelist = [];
+
+        // If the link configuration specified a whitelist of domains
+        if (preg_match('/^\[.*]$/', $link->allowHotlinks)) {
+            // Decode the array of whitelisted domains
+            $hotlinksWhitelist = Json::decode($link->allowHotlinks);
+        }
+
+        // Loop through hotlinked domains via Settings
+        foreach ($settings->hotlinksWhitelist as $hotlink) {
+            // Add normalized domain to list
+            $hotlinksWhitelist[] = $hotlink['whitelistDomain'];
+        }
+
+        // Normalize all whitelisted domains
+        array_walk($hotlinksWhitelist, static function (string $value) {
+            return strtolower(trim($value));
+        });
+
+        // Whether the referrer domain has been whitelisted
+        $domainPermitted = in_array($referrer, $hotlinksWhitelist, true);
+
+        // If hotlinking domain is allowed, return true
+        if ($domainPermitted) {
+            return true;
+        }
+
+        // Invalid hotlink
+        return false;
     }
 
     /**
@@ -371,7 +443,7 @@ class Download extends Component
         return ($link->totalDownloads < $link->maxDownloads);
     }
 
-    // =========================================================================
+    // ========================================================================= //
 
     /**
      * Check whether user is authorized to download file.
@@ -454,6 +526,22 @@ class Download extends Component
     private function _isCurrentUserInGroup(string $group): bool
     {
         return in_array($group, $this->_userGroups, true);
+    }
+
+    // ========================================================================= //
+
+    /**
+     * Get the domain of a given URL.
+     *
+     * @param string $url
+     * @return string
+     */
+    private function _getDomain(string $url): string
+    {
+        // Get the domain
+        $domain = parse_url($url, PHP_URL_HOST);
+        // Return lowercase domain
+        return strtolower($domain);
     }
 
 }

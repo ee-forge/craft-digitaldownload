@@ -47,12 +47,15 @@ $token = DigitalDownload::$plugin->digitalDownload->createToken($asset, [
  - **asset** - The downloadable Asset.
  - **options** - A key-value set of options.
 
-| Option       | Default  | Description
-|:-------------|:---------|:------------------
-| expires      | `'P14D'` | Time until asset key expires. Accepts any valid PHP interval specification.
-| maxDownloads | `0`      | Maximum number of downloads allowed. (0 = unlimited)
-| requireUser  | _null_   | If downloads are restricted to specific users and/or user groups.
-| headers      | `{}`     | Associative array of optional HTTP headers to send during download.
+| Option                          | Default  | Description                                                                 |
+|:--------------------------------|:---------|:----------------------------------------------------------------------------|
+| expires                         | `'P14D'` | Time until asset key expires. Accepts any valid PHP interval specification. |
+| maxDownloads                    | `0`      | Maximum number of downloads allowed. (0 = unlimited)                        |
+| [requireUser](#requireuser)     | _null_   | If downloads are restricted to specific users and/or user groups.           |
+| [allowHotlinks](#allowhotlinks) | `'none'` | Whether to allow [hotlinking](/hotlinking/) of download link.               |
+| headers                         | `{}`     | Associative array of optional HTTP headers to send during download.         |
+
+### `requireUser`
 
 The `requireUser` option can take on a variety of forms:
 
@@ -67,4 +70,26 @@ null                      // Anyone can download (default)
 ['mygroup', 'otherGroup'] // Multiple user groups
 
 ['mygroup', 467]          // Mix & match users and groups
+```
+
+### `allowHotlinks`
+
+There are three ways to use the `allowHotlinks` option:
+
+#### Prevent hotlinking from all other websites. (default)
+```twig
+'allowHotlinks': 'none'
+```
+
+#### Allow hotlinking from all other websites.
+```twig
+'allowHotlinks': 'all'
+```
+
+#### Allow hotlinking from specified sites (an array of domains).
+```twig
+'allowHotlinks': [
+    'friendlysite.com',
+    'anotherfriendlysite.com'
+]
 ```

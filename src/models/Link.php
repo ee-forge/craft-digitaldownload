@@ -43,6 +43,11 @@ class Link extends Model
     public string $token;
 
     /**
+     * @var string|array Which domains (besides this one) can download linked files.
+     */
+    public string|array $allowHotlinks = 'none';
+
+    /**
      * @var string Optionally append or replace download headers.
      */
     public string $headers;

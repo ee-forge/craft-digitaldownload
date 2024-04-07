@@ -56,7 +56,7 @@ class DigitalDownloadService extends Component
         return DigitalDownload::$plugin->digitalDownload_token->createToken($file, $options);
     }
 
-    // =========================================================================
+    // ========================================================================= //
 
     /**
      * Generates a URL to download the file.
@@ -122,7 +122,7 @@ class DigitalDownloadService extends Component
         return Template::raw("<a href=\"{$url}\">{$label}</a>");
     }
 
-    // =========================================================================
+    // ========================================================================= //
 
     /**
      * Get the link data from an existing token.
@@ -183,7 +183,7 @@ class DigitalDownloadService extends Component
         $this->disableExpiredLinks();
     }
 
-    // =========================================================================
+    // ========================================================================= //
 
     /**
      * Ensures that we're working with a proper token

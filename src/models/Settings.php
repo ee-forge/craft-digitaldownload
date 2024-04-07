@@ -26,6 +26,16 @@ class Settings extends Model
     public string $shortPath = 'download';
 
     /**
+     * @var string Which domains (besides this one) can download linked files.
+     */
+    public string $allowHotlinks = 'none';
+
+    /**
+     * @var array List of domains allowed to hotlink downloadable files.
+     */
+    public array $hotlinksWhitelist = [];
+
+    /**
      * @var bool Whether to keep a detailed log of all downloads.
      */
     public bool $keepDownloadLog = false;
