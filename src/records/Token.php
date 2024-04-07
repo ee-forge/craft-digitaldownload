@@ -23,6 +23,7 @@ use yii\db\ActiveQueryInterface;
  * @property int $id
  * @property int $assetId
  * @property string $token
+ * @property string|array $allowHotlinks
  * @property string $headers
  * @property int $enabled
  * @property DateTime $expires
@@ -54,7 +55,7 @@ class Token extends ActiveRecord
      */
     public function getAsset(): ActiveQueryInterface
     {
-        return $this->hasOne(Asset::class, ['id' => 'assetId']);
+        return self::hasOne(Asset::class, ['id' => 'assetId']);
     }
 
 }

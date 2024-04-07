@@ -41,10 +41,17 @@ class Token extends Component
         $token = DigitalDownload::$plugin->digitalDownload->hash();
 
         // Load options
-        $ttl          = ($options['expires']      ?? 'P14D');
-        $requireUser  = ($options['requireUser']  ?? null);
-        $maxDownloads = ($options['maxDownloads'] ?? 0);
-        $headers      = ($options['headers']      ?? []);
+        $ttl           = ($options['expires']       ?? 'P14D');
+        $requireUser   = ($options['requireUser']   ?? null);
+        $maxDownloads  = ($options['maxDownloads']  ?? 0);
+        $allowHotlinks = ($options['allowHotlinks'] ?? 'none');
+        $headers       = ($options['headers']       ?? []);
+
+        // If hotlinks are an array
+        if (is_array($allowHotlinks)) {
+            // Encode the hotlinks array
+            $allowHotlinks = Json::encode($allowHotlinks);
+        }
 
         // Set expiration date
         $expires = new DateTime();
@@ -54,12 +61,13 @@ class Token extends Component
         $linkRecord = new TokenRecord();
 
         // Configure token record
-        $linkRecord->assetId      = $file->id;
-        $linkRecord->token        = $token;
-        $linkRecord->headers      = Json::encode($headers, JSON_FORCE_OBJECT);
-        $linkRecord->expires      = $expires;
-        $linkRecord->requireUser  = Json::encode($requireUser);
-        $linkRecord->maxDownloads = $maxDownloads;
+        $linkRecord->assetId       = $file->id;
+        $linkRecord->token         = $token;
+        $linkRecord->allowHotlinks = $allowHotlinks;
+        $linkRecord->headers       = Json::encode($headers, JSON_FORCE_OBJECT);
+        $linkRecord->expires       = $expires;
+        $linkRecord->requireUser   = Json::encode($requireUser);
+        $linkRecord->maxDownloads  = $maxDownloads;
 
         // Save token record
         $linkRecord->save();

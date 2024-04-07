@@ -25,7 +25,7 @@ function updateDemoPath() {
     $demoPath.html(demoPath);
 }
 
-// =========================================================================
+// ========================================================================= //
 
 // Update path while typing
 $shortPath.on('keyup', function() {

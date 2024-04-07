@@ -1,5 +1,7 @@
 {% import '_includes/forms' as forms %}
 
+{% set currentDomain = siteUrl|replace('/^https?:\\/\\//', '')|replace('/\\/$/', '') %}
+
 {% macro configWarning(setting) -%}
     {% set docsUrl = 'https://www.doublesecretagency.com/plugins/digital-download/docs/override-settings' %}
     <p class="warning">
@@ -11,15 +13,23 @@
 {% from _self import configWarning %}
 
 {% css %}
-    #content code {
-        color: #476582;
-        padding: .25rem .5rem;
-        margin: 0;
-        font-size: .85em;
-        background-color: rgba(27,31,35,.05);
-        background: rgba(0,72.85714285714286,127.5,.054901960784314);
-        border-radius: 3px;
-    }
+#content code {
+    color: #476582;
+    padding: .25rem .5rem;
+    margin: 0;
+    font-size: .85em;
+    background-color: rgba(27,31,35,.05);
+    background: rgba(0,72.85714285714286,127.5,.054901960784314);
+    border-radius: 3px;
+}
+
+ul.hotlink-options {
+    list-style: disc;
+    padding-left: 18px;
+}
+ul.hotlink-options li {
+
+}
 {% endcss %}
 
 {% set longPath = 'index.php/' ~ craft.app.config.general.actionTrigger ~ '/digitalDownload/download?u=' %}
@@ -40,6 +50,54 @@
 {{ 'shortPath' in overrideKeys ? configWarning('shortPath') }}
 
 <p><a href="#" onclick="alert('Example download initiated...')">{{ siteUrl }}<span id="demoPath">{{ path }}</span>(token)</a></p>
+
+<hr/>
+
+<h2>Hotlinking</h2>
+
+<p><a href="https://plugins.doublesecretagency.com/digital-download/hotlinking/">Hotlinking</a> from other websites is <strong>forbidden by default</strong>. When necessary, there are two ways to configure hotlinking:</p>
+
+<ul class="hotlink-options">
+    <li><strong>Option 1</strong> - Configure individual link availability when <a href="https://plugins.doublesecretagency.com/digital-download/creating-a-token/#createtoken-asset-options">creating each token</a>, or</li>
+    <li><strong>Option 2</strong> - Set the "Allow Hotlinks" field below to manage the availability of all links in the system.</li>
+</ul>
+
+{{ forms.selectField({
+    label: 'Allow Hotlinks'|t('digital-download'),
+    instructions: 'Should other websites be allowed to link to your downloadable files?'|t('digital-download'),
+    name: 'allowHotlinks',
+    id: 'allowHotlinks',
+    options: [
+        {value: 'none',      label: 'No hotlinking allowed'|t('digital-download')},
+        {value: 'all',       label: 'Hotlink from any website'|t('digital-download')},
+        {value: 'specified', label: 'Only hotlink from specified sites'|t('digital-download')},
+    ],
+    value: (settings.allowHotlinks ?? 'none'),
+    toggle: true,
+}) }}
+
+<div id="specified" class="hidden">
+    {{ forms.editableTableField({
+        label: "Hotlink Domain Whitelist"|t('digital-download'),
+        instructions: "Which domains (besides this one) can link to downloadable files?"|t('digital-download'),
+        id: 'hotlinksWhitelist',
+        name: 'hotlinksWhitelist',
+        cols: {
+            whitelistDomain: {
+                type: 'singleline',
+                heading: "Domains"|t('digital-download'),
+                info: "List all other domains which are permitted to hotlink downloadable files."|t('digital-download'),
+                placeholder: 'www.friendlysite.com'|t('app'),
+                code: true,
+            },
+        },
+        rows: (settings.hotlinksWhitelist ?? []),
+        allowAdd: true,
+        allowDelete: true,
+        allowReorder: true,
+        addRowLabel: 'Add a friendly domain'|t('app'),
+    }) }}
+</div>
 
 <hr/>
 
