@@ -6,8 +6,8 @@ description: Protect your download links by preventing downloads from other doma
 
 Hotlinking (also known as leeching) is when another website links directly to your downloadable content. For a variety of reasons, you probably don't want your content to be downloadable from other websites.
 
-:::warning Prevented by default since v3.1
-Once hotlink prevention was introduced in v3.1, prevention became the default behavior.
+:::warning Prevented by default since v2.3 (in Craft 4) and v3.1 (in Craft 5)
+Once hotlink prevention was introduced, prevention became the default behavior for all new links.
 :::
 
 ## Allowing Hotlinks
