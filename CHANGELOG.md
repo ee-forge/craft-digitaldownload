@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.1.0 - 2024-04-08
 
 > [!WARNING]
 > [Hotlinking](https://plugins.doublesecretagency.com/digital-download/hotlinking/) from other websites is **prevented by default** for all new links. Hotlinking can be enabled either on the "Settings" page, or when configuring an individual token.
