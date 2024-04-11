@@ -1,4 +1,4 @@
-<img align="left" src="https://plugins.doublesecretagency.com/digital-download/images/icon.svg" alt="Plugin icon">
+<img width="66" align="left" src="https://plugins.doublesecretagency.com/digital-download/images/icon.svg" alt="Plugin icon">
 
 # Digital Download plugin for Craft CMS
 
