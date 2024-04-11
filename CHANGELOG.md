@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.3.1 - 2024-04-11
 
 ### Fixed
 - Fixed bug which occurred when referrer URL is null.
