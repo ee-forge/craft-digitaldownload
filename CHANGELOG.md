@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- Fixed bug which occurred when referrer URL is null.
+
 ## 2.3.0 - 2024-04-09
 
 > [!WARNING]

@@ -287,6 +287,12 @@ class Download extends Component
             return false;
         }
 
+        // If base site URL is invalid, set error and bail
+        if (!UrlHelper::baseSiteUrl()) {
+            $link->error = 'Unable to determine the base site URL.';
+            return false;
+        }
+
         // If link is not enabled, set error and bail
         if (!$this->_isEnabled($link)) {
             $link->error = 'Download link is disabled.';
@@ -533,11 +539,15 @@ class Download extends Component
     /**
      * Get the domain of a given URL.
      *
-     * @param string $url
+     * @param string|null $url
      * @return string
      */
-    private function _getDomain(string $url): string
+    private function _getDomain(?string $url): string
     {
+        // If no URL, return empty string
+        if (!$url) {
+            return '';
+        }
         // Get the domain
         $domain = parse_url($url, PHP_URL_HOST);
         // Return lowercase domain
