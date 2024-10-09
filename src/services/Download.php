@@ -12,6 +12,8 @@
 namespace doublesecretagency\digitaldownload\services;
 
 use Craft;
+use craft\awss3\Fs as S3Fs;
+use craft\awss3\S3Client;
 use craft\base\Component;
 use craft\elements\Asset;
 use craft\elements\User;
@@ -95,9 +97,6 @@ class Download extends Component
         if (!$link->error) {
             $link->error = 'Unknown error when downloading file.';
         }
-
-        // Track failed download
-        $this->trackDownload($link);
 
         // Something went wrong, throw error message
         throw new HttpException(403, $link->error);
@@ -186,10 +185,44 @@ class Download extends Component
             // Set path for local file
             $assetFilePath = $filepath.$asset->filename;
 
+        } elseif (get_class($filesystem) === S3Fs::class) {
+
+            // Public URL so move ahead
+            if ($filesystem->hasUrls) {
+                $assetFilePath = preg_replace('/ /', '%20', $asset->url);
+            } else {
+                // Get a presigned URL
+                $client = new S3Client([
+                    'version' => 'latest',
+                    'region'  => $filesystem->region,
+                    'credentials' => [
+                        'key'    => $filesystem->keyId,
+                        'secret' => $filesystem->secret,
+                    ],
+                ]);
+
+                try {
+                    $command = $client->getCommand('GetObject', [
+                        'Bucket' => $filesystem->bucket,
+                        'Key'    => trim($filesystem->subfolder, '/') . '/' . $asset->folderPath . $asset->filename,
+                    ]);
+
+                    $request = $client->createPresignedRequest($command, '+5 minutes');
+
+                    // Get the actual presigned-url
+                    $assetFilePath = (string) $request->getUri();
+
+                } catch (AwsException $e) {
+                    // Output error message if fails
+                    Craft::error($e->getMessage(), __METHOD__);
+                    return;
+                }
+            }
+
         } else {
 
             // If no public URL, bail
-            if (!$asset->url) {
+            if (!$filesystem->hasUrls) {
                 $link->error = 'Cloud assets require a public URL.';
                 return;
             }
